@@ -2,8 +2,6 @@ name: Project Build
 on:
   pull_request:
     branches: [ "develop" ]
-  push:
-    branches: [ "develop" ]
 
 jobs:
   build_project:
@@ -23,7 +21,7 @@ jobs:
       run: chmod +x ./gradlew
 
     - name: Build Debug APK
-      run: ./gradlew build
+      run: ./gradlew assembleDebug
 
     - name: Short SHA
       run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
