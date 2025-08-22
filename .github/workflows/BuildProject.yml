@@ -2,7 +2,7 @@ name: Project Build
 on:
   pull_request:
     branches: [ "develop" ]
-  pushes:
+  push:
     branches: [ "develop" ]
 
 jobs:
