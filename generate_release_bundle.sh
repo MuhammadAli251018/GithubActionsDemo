@@ -9,6 +9,7 @@ if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
   VERSION_REF="$GITHUB_REF_NAME"
 else
   VERSION_REF="${GITHUB_SHA::7}"
+fi
 
 mkdir -p ~/.gradle
 {
@@ -19,6 +20,4 @@ mkdir -p ~/.gradle
   echo "VERSION_REF=$VERSION_REF"
 } >> ~/.gradle/gradle.properties
 
-./gradlew generateReleaseBundle
-
-fi
+./gradlew generateReleaseBundle --stacktrace

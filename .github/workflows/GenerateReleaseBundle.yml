@@ -17,42 +17,22 @@ jobs:
           java-version: 17
           cache: gradle
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+      - name: Make script executable
+        run: chmod +x ./generate_release_bundle.sh
 
-      - name: Restore keystore
-        run: |
-          echo "$KEYSTORE_BASE64" | base64 -d > release.keystore
+      - name: Run release bundle script
+        run: bash ./generate_release_bundle.sh
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-
-      - name: Write keystore properties
-        run: |
-          mkdir -p ~/.gradle
-          {
-            echo "RELEASE_STORE_PASSWORD=${{ secrets.RELEASE_STORE_PASSWORD }}"
-            echo "RELEASE_KEY_ALIAS=${{ secrets.RELEASE_KEY_ALIAS }}"
-            echo "RELEASE_KEY_PASSWORD=${{ secrets.RELEASE_KEY_PASSWORD }}"
-          } >> ~/.gradle/gradle.properties
-
-      - name: Determine version metadata
-        id: meta
-        run: |
-          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
-          VERSION_REF="${GITHUB_REF_NAME}"
-          else
-          VERSION_REF="${GITHUB_SHA::7}"
-          fi
-          echo "version_ref=$VERSION_REF" >> "$GITHUB_OUTPUT"
-          echo "Combined: $VERSION_REF"
-
-      - name: Assemble Release Bundle
-        run: ./gradlew :app:bundleRelease --stacktrace
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          GITHUB_REF_TYPE: ${{ github.ref_type }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_SHA: ${{ github.sha }}
 
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-${{ steps.meta.outputs.version_ref }}
-          path: |
-            app/build/outputs/bundle/release/app-release-${{ steps.meta.outputs.version_ref }}.aab
-            app/build/outputs/bundle/release/app-release.aab
+          name: app-release
+          path: app/build/outputs/bundle/release/*.aab

@@ -28,13 +28,22 @@ android {
     }
 
     signingConfigs {
-        create("release") {
+        register("release") {
             val hasSigning = providers.gradleProperty("RELEASE_STORE_PASSWORD").isPresent
+            val keyFilePath = providers.gradleProperty("RELEASE_STORE_FILE").get()
+            val _storePass = providers.gradleProperty("RELEASE_STORE_PASSWORD").get()
+            val _keyAlias = providers.gradleProperty("RELEASE_KEY_ALIAS").get()
+            val _keyPass = providers.gradleProperty("RELEASE_KEY_PASSWORD").get()
+            println("Key file path: $keyFilePath")
+            println("Has signing: $hasSigning")
+            println("Store password: ${_storePass}")
+            println("Key alias: ${_keyAlias}")
+            println("Key password: ${_keyPass}")
             if (hasSigning) {
-                storeFile = rootProject.file("release.keystore")
-                storePassword = providers.gradleProperty("RELEASE_STORE_PASSWORD").get()
-                keyAlias = providers.gradleProperty("RELEASE_KEY_ALIAS").get()
-                keyPassword = providers.gradleProperty("RELEASE_KEY_PASSWORD").get()
+                storeFile = rootProject.file(keyFilePath)
+                storePassword = _storePass
+                keyAlias = _keyAlias
+                keyPassword = _keyPass
             }
         }
     }
