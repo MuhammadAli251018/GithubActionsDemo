@@ -1,7 +1,16 @@
+import com.luminate.luminatelauncher.build_helpers.GenerateReleaseBundleTask
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+}
+
+tasks.register<GenerateReleaseBundleTask>("generateReleaseBundle") {
+    group = "build"
+    description = "Generates a release AAB and attach the version reference to the filename."
+    dependsOn(":app:bundleRelease")
+    versionReference.set(project.findProperty("VERSION_REF") as? String ?: "no-version-ref")
 }
 
 android {
