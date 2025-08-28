@@ -3,7 +3,9 @@ set -e
 
 chmod +x ./gradlew
 
-echo "$KEYSTORE_BASE64" | base64 --decode > release.keystore
+if [ ! -f release.keystore ]; then
+  echo "$KEYSTORE_BASE64" | base64 --decode > release.keystore
+fi
 
 if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
   VERSION_REF="$GITHUB_REF_NAME"
