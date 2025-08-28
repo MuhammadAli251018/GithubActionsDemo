@@ -6,18 +6,25 @@ grep_prop() {
 }
 
 # Always read signing info
+RELEASE_STORE_FILE=$(grep_prop "RELEASE_STORE_FILE")
 RELEASE_STORE_PASSWORD=$(grep_prop "RELEASE_STORE_PASSWORD")
 RELEASE_KEY_ALIAS=$(grep_prop "RELEASE_KEY_ALIAS")
 RELEASE_KEY_PASSWORD=$(grep_prop "RELEASE_KEY_PASSWORD")
 
+# Check RELEASE_STORE_FILE property
+if [ -z "$RELEASE_STORE_FILE" ]; then
+  echo "Error: RELEASE_STORE_FILE property is missing in local.properties."
+  exit 1
+fi
+
 # Check for keystore file
-if [ ! -f release.keystore ]; then
+if [ ! -f "$RELEASE_STORE_FILE" ]; then
   KEYSTORE_BASE64=$(grep_prop "KEYSTORE_BASE64")
   if [ -z "$KEYSTORE_BASE64" ]; then
-    echo "Error: release.keystore does not exist and KEYSTORE_BASE64 is missing in local.properties."
+    echo "Error: $RELEASE_STORE_FILE does not exist and KEYSTORE_BASE64 is missing in local.properties."
     exit 1
   fi
-  echo "$KEYSTORE_BASE64" | base64 --decode > release.keystore
+  echo "$KEYSTORE_BASE64" | base64 --decode > "$RELEASE_STORE_FILE"
 fi
 
 # Check required signing info
@@ -34,7 +41,7 @@ fi
 
 mkdir -p ~/.gradle
 {
-  echo "RELEASE_STORE_FILE=release.keystore"
+  echo "RELEASE_STORE_FILE=$RELEASE_STORE_FILE"
   echo "RELEASE_STORE_PASSWORD=$RELEASE_STORE_PASSWORD"
   echo "RELEASE_KEY_ALIAS=$RELEASE_KEY_ALIAS"
   echo "RELEASE_KEY_PASSWORD=$RELEASE_KEY_PASSWORD"
